@@ -22,13 +22,13 @@ chrome.browserAction.onClicked.addListener(function(tab) {
     if (isSet) {
         isSet = false;
         chrome.browserAction.setIcon({
-            path : "off-icon.png"
+            path : {"19" : "off-icon-19.png"}
         });
     }
     else{
         isSet = true;
         chrome.browserAction.setIcon({
-            path : "on-icon.png"
+            path : {"19" : "on-icon-19.png"}
         });
     }
 });
