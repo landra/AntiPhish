@@ -1,7 +1,9 @@
-if($("input[type='password']").length>0){
+//if($("input[type='password']").length>0){
     //whoisRegistrantNameAjax(window.location.hostname);
-    phishTankCheck(window.location.hostname);
-}
+    //phishTankCheck(window.location.hostname);
+    var f = searchDocumentForText('Facebook');
+    debugger;
+//}
 
 function whoisRegistrantNameAjax(domain) {
     $.ajax({
@@ -32,4 +34,23 @@ function phishTankCheck(domain) {
             alert('error');
         }
     });
+}
+
+function searchDocumentForText(text) {
+    var documentContainsText = false;
+    $('*').not('a').each(function(){
+        if (searchElementForText($(this), text)){
+            documentContainsText =  true;
+        }
+    });
+    return documentContainsText;
+}
+
+function searchElementForText(element, text) {
+    return element.clone()    //clone the element
+        .children() //select all the children
+        .remove()   //remove all the children
+        .end()  //again go back to selected element
+        .text()
+        .includes(text);
 }
