@@ -1,6 +1,6 @@
 var top20Sites = getTop20Sites();
 
-if($("input[type='password']").length>0){
+if($("input[type='password']").length>0 || (searchDocumentForText('credit card')&&searchDocumentForText('security code'))){
     startCheckPipeline();
 }
 
@@ -14,7 +14,18 @@ function registrantOrganizationCheck(domain, site) {
         type: 'GET',
         dataType: 'json',
         success: function(res) {
-            if (!res.WhoisRecord.registrant.organization.toLowerCase().includes(site.toLowerCase())){
+            var registrantRecord;
+            if ('registrant' in res.WhoisRecord){
+                registrantRecord = res.WhoisRecord.registrant;
+            }
+            else if ('registrant' in res) {
+                registrantRecord = res.WhoisRecord.registryData.registrant;
+            }
+            else {
+                alert('Registrant is anonymous, we don\'t trust this site');
+                return;
+            }
+            if (!registrantRecord.organization.toLowerCase().includes(site.toLowerCase())){
                 alert("Warning, this site has characteristics of a phishing site.  Proceed with caution.")
             }
         },
@@ -40,7 +51,13 @@ function phishTankCheck(domain) {
                     if (res.results.verified) {
                         alert("Warning! This has been reported as phishing site, but has not been verified.  Be careful.");
                     }
+                    else {
+                        checkForOtherPhishing();
+                    }
                 }
+            }
+            else {
+                checkForOtherPhishing();
             }
         },
         error: function(XMLHttpRequest, textStatus, errorThrown) {
@@ -51,7 +68,7 @@ function phishTankCheck(domain) {
 
 function searchDocumentForText(text) {
     var documentContainsText = false;
-    $('*').not('a').each(function(){
+    $('*').not('a').not('script').each(function(){
         if (searchElementForText($(this), text)){
             documentContainsText =  true;
         }
@@ -74,6 +91,7 @@ function checkForOtherPhishing(){
         if (searchDocumentForText(value)){
             var domain = window.location.hostname;
             registrantOrganizationCheck(domain, value);
+            return false;
         }
     });
 }
@@ -98,5 +116,10 @@ function getTop20Sites() {
         'vimeo',
         'microsoft',
         'flickr',
-        'yahoo']
+        'yahoo',
+        'paypal',
+        'venmo',
+        'wells fargo',
+        'chase',
+        'bank of america']
 }
